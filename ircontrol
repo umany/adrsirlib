@@ -4,8 +4,11 @@
 import adrsirlib as ir
 import os
 import sys
+import fcntl
+import time
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "irdata")
+LOCK_FILE = "/tmp/adrsir.lock"
 
 def read_to_file(no, filename):
 	str = ir.get(no)
@@ -77,11 +80,19 @@ if __name__ == '__main__':
 		usage()
 		exit()
 
+	if os.path.exists(LOCK_FILE) == False:
+		with open(LOCK_FILE, 'w'): pass
+
 	command = sys.argv[1]
 	if command == 'store':
 		store(sys.argv[2:])
 	elif command == 'send':
+		lfd = open(LOCK_FILE, 'r')
+		fcntl.flock(lfd, fcntl.LOCK_EX)
 		send(sys.argv[2:])
+		time.sleep(0.2)
+		fcntl.flock(lfd, fcntl.LOCK_UN)
+		lfd.close()
 	elif command == 'list':
 		display_list()
 	else:
