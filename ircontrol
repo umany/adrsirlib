@@ -8,7 +8,7 @@ import fcntl
 import time
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "irdata")
-LOCK_FILE = "/tmp/adrsir.lock"
+LOCK_FILE = os.path.join(os.path.dirname(__file__), ".lock")
 
 def read_to_file(no, filename):
 	str = ir.get(no)
